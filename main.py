@@ -1,6 +1,6 @@
 import shlex
 
-from models import Player, Session, Transaction, TransactionType
+from models import Player, Session, SplitConfig, Transaction, TransactionType
 from storage import delete_session, get_session, list_sessions, save_session
 
 active_session = None
@@ -16,13 +16,10 @@ def get_prompt():
 # Prints a report of the session's transactions and players.
 def print_report(session):
     width = 60
-
-    # find the widest amount so we can align everything to it
     all_amounts = [session.total_income, session.total_expenses, session.net_profit]
     all_amounts += [t.amount for t in session.transactions]
     amt_width = max(len(f"{a:,.2f}") for a in all_amounts) if all_amounts else 10
-
-    desc_width = width - amt_width - 10  # 10 = padding + " aUEC" + "[+] "
+    desc_width = width - amt_width - 10
 
     print("\n" + "─" * width)
     print(f"│{'Session Report':^{width - 2}}│")
@@ -54,6 +51,15 @@ def print_report(session):
     print(
         f"  {'Net profit:':<{desc_width + 4}} {session.net_profit:>{amt_width},.2f} aUEC"
     )
+
+    split = session.calculate_split()
+    if split:
+        print("\n" + "─" * width)
+        print(f"  {'Player':<{desc_width + 4}} {'Share':>{amt_width + 5}}")
+        print("─" * width)
+        for name, amount in split.items():
+            print(f"  {name:<{desc_width + 4}} {amount:>{amt_width},.2f} aUEC")
+
     print("─" * width + "\n")
 
 
@@ -74,29 +80,31 @@ def handle_command(parts):
     elif cmd in ("help", "h", "?"):
         print("""
     Commands:
-      help                     show this help message
-      new <name>               create a new session
-      use <name>               set active session
-      unuse                    clear active session
-      delete <name>            delete a session
-      list                     show all sessions
-      add-player <name>        add a player to active session
-      remove-player <name>     remove a player from active session
-      income <desc> <amount>   record income
-      expense <desc> <amount>  record an expense
-      report                   show session report
-      quit                     exit
+      help                          show this help message
+      new <name>                    create a new session
+      use <name>                    set active session
+      unuse                         clear active session
+      delete <name>                 delete a session
+      list                          show all sessions
+      add-player <name>             add a player to active session
+      remove-player <name>          remove a player from active session
+      income <desc> <amount>        record income
+      expense <desc> <amount>       record an expense
+      report                        show session report
+      split <mode> <name>:<value>   split income
+      quit                          exit
 
     Aliases:
-      help                h, ?
-      delete              del
-      list                ls
-      add-player          addp
-      remove-player       rmp
-      income              inc, i
-      expense             exp, e
-      report              rep, r
-      quit                exit, q
+      help                          h, ?
+      delete                        del
+      list                          ls
+      add-player                    addp
+      remove-player                 rmp
+      income                        inc, i
+      expense                       exp, e
+      report                        rep, r
+      split                         sp
+      quit                          exit, q
 
     """)
 
@@ -225,6 +233,59 @@ def handle_command(parts):
             return
         print_report(s)
 
+    # Split income
+    elif cmd in ("split", "sp"):
+        s = active_session
+        if not s:
+            print("No active session. Use 'use <name>' first.")
+            return
+        if len(parts) < 2:
+            print(
+                "Usage: split equal | split percentage Name:pct... | split fixed Name:amt..."
+            )
+            return
+
+        mode = parts[1]
+
+        if mode == "equal":
+            s.split_config = SplitConfig(mode="equal", overrides={})
+            save_session(s)
+            print("Split set: equal among all players.")
+
+        elif mode == "percentage":
+            overrides = {}
+            for pair in parts[2:]:
+                name, pct = pair.split(":")
+                overrides[name.lower()] = float(pct)
+            s.split_config = SplitConfig(mode="percentage", overrides=overrides)
+            save_session(s)
+            assigned = sum(overrides.values())
+            unassigned = [p for p in s.players if p.name.lower() not in overrides]
+            remainder = (100 - assigned) / len(unassigned) if unassigned else 0
+            print("Split set:")
+            for p in s.players:
+                pct = overrides.get(p.name.lower(), remainder)
+                print(f"  {p.name}: {pct:.1f}%")
+
+        elif mode == "fixed":
+            overrides = {}
+            for pair in parts[2:]:
+                name, amt = pair.split(":")
+                overrides[name.lower()] = float(amt)
+            s.split_config = SplitConfig(mode="fixed", overrides=overrides)
+            save_session(s)
+            print("Split set:")
+            for p in s.players:
+                amt = overrides.get(p.name.lower(), "remainder")
+                print(
+                    f"  {p.name}: {amt} aUEC"
+                    if amt != "remainder"
+                    else f"  {p.name}: remainder"
+                )
+
+        else:
+            print(f"Unknown split mode '{mode}'. Use equal, percentage, or fixed.")
+
     # If command is unrecognised
     else:
         print(f"Unknown command '{cmd}'. Type 'help' for help.")
@@ -239,11 +300,11 @@ def main():
             parts = shlex.split(raw)
             handle_command(parts)
         except (KeyboardInterrupt, EOFError):
-            print("\nGoodbye.")
+            print("\nBye citizen! o7")
             break
         except SystemExit:
             break
-    input("Press any key to exit...")
+    input("Press Enter to exit...")
 
 
 # Entry point of the application.
