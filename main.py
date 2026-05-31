@@ -6,6 +6,15 @@ from core.storage import delete_session, get_session, list_sessions, save_sessio
 active_session = None
 
 
+# Command error crash prevention
+def parse_amount(value):
+    try:
+        return float(value)
+    except ValueError:
+        print(f"'{value}' isn't a valid amount.")
+        return None
+
+
 # Returns the prompt string to display to the user.
 def get_prompt():
     if active_session:
@@ -198,10 +207,8 @@ def handle_command(parts):
         if not s:
             print("No active session. Use 'use <name>' first.")
             return
-        try:
-            amount = float(parts[2])
-        except ValueError:
-            print(f"'{parts[2]}' isn't a valid number.")
+        amount = parse_amount(parts[2])
+        if amount is None:
             return
         s.transactions.append(Transaction(parts[1], amount, TransactionType.INCOME))
         save_session(s)
@@ -216,10 +223,8 @@ def handle_command(parts):
         if not s:
             print("No active session. Use 'use <name>' first.")
             return
-        try:
-            amount = float(parts[2])
-        except ValueError:
-            print(f"'{parts[2]}' isn't a valid number.")
+        amount = parse_amount(parts[2])
+        if amount is None:
             return
         s.transactions.append(Transaction(parts[1], amount, TransactionType.EXPENSE))
         save_session(s)
