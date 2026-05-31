@@ -1,5 +1,10 @@
 # Fintrack
 
+<p align="center">
+    <a href="https://github.com/KosteQ314/FinTrack/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/KosteQ314/FinTrack"></a>
+    <a href="https://github.com/KosteQ314/FinTrack/graphs/commit-activity"><img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/KosteQ314/FinTrack?color=neongreen"></a>
+</p>
+
 > *Your personal financial command center for the 'verse.*
 
 Track income, expenses, assets, and profits across Star Citizen with a modern and intuitive financial management platform.
