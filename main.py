@@ -21,10 +21,12 @@ def handle_command(parts):
 
     cmd = parts[0].lower()
 
+    # Quit command
     if cmd in ("quit", "exit", "q"):
         print("Bye citizen! o7")
         raise SystemExit
 
+    # Help command
     elif cmd in ("help", "h", "?"):
         print("""
     Commands:
@@ -49,6 +51,8 @@ def handle_command(parts):
       report
     """)
 
+    # Session management commands
+    # New session
     elif cmd == "new":
         if len(parts) < 2:
             print("Usage: new <name>")
@@ -58,6 +62,7 @@ def handle_command(parts):
         save_session(s)
         print(f"Created session '{name}'.")
 
+    # Use session
     elif cmd == "use":
         if len(parts) < 2:
             print("Usage: use <name>")
@@ -69,10 +74,12 @@ def handle_command(parts):
         active_session = s
         print(f"Now using '{s.name}'.")
 
+    # Unuse session
     elif cmd == "unuse":
         active_session = None
         print("Cleared active session.")
 
+    # Delete session
     elif cmd in ("delete", "del"):
         if len(parts) < 2:
             print("Usage: delete <name>")
@@ -85,6 +92,7 @@ def handle_command(parts):
         else:
             print(f"No session named '{parts[1]}'.")
 
+    # List sessions
     elif cmd in ("list", "ls"):
         sessions = list_sessions()
         if not sessions:
@@ -92,6 +100,7 @@ def handle_command(parts):
         for s in sessions:
             print(f"  {s.name}  —  net: {s.net_profit}")
 
+    # If command is unrecognised
     else:
         print(f"Unknown command '{cmd}'. Type 'help' for help.")
 
