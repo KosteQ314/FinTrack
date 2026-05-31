@@ -1,7 +1,7 @@
 import shlex
 
-from models import Player, Session, SplitConfig, Transaction, TransactionType
-from storage import delete_session, get_session, list_sessions, save_session
+from core.models import Player, Session, SplitConfig, Transaction, TransactionType
+from core.storage import delete_session, get_session, list_sessions, save_session
 
 active_session = None
 

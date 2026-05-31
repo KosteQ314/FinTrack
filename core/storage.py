@@ -1,7 +1,7 @@
 import json
 import os
 
-from models import Player, Session, SplitConfig, Transaction, TransactionType
+from core.models import Player, Session, SplitConfig, Transaction, TransactionType
 
 # Where the session data is saved
 SAVE_PATH = os.path.expanduser("~/.FinTrack/sessions.json")
