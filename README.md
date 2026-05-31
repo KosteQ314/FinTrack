@@ -12,7 +12,7 @@ Track income, expenses and profits across Star Citizen with a financial manageme
 ## Roadmap
 
 - [x] Transaction tracking
-- [ ] Player income splitting
+- [x] Player income splitting
 - [ ] GUI
 
 The roadmap will be updated as the project progresses and more features might be added based on the recommendations as well as my personal ideas, what is currently here are the basic features that I want to implement first.
