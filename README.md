@@ -5,9 +5,9 @@
     <a href="https://github.com/KosteQ314/FinTrack/graphs/commit-activity"><img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/KosteQ314/FinTrack?color=neongreen"></a>
 </p>
 
-> *Your personal financial command center for the 'verse.*
+> *Your personal financial command center for the verse.*
 
-Track income, expenses, assets, and profits across Star Citizen with a modern and intuitive financial management platform.
+Track income, expenses and profits across Star Citizen with a financial management platform.
 
 ## Roadmap
 
