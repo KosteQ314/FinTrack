@@ -1,4 +1,4 @@
-# Fintrack
+# FinTrack
 
 <p align="center">
     <a href="https://github.com/KosteQ314/FinTrack/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/KosteQ314/FinTrack"></a>
