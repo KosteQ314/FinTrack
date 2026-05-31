@@ -2,8 +2,6 @@
 
 ### Features
 
-- add basic funcionality (8385216f242a2a00be7b141ab68d6663907af569)
-- add multiple commands (5ff0faa4c2b99dc79f4654452bf08b171102a45f)
 - add player split calculation (f3c931ee065f1f934528924caa1ea0a7b059d453)
 
 ### Performance Improvements
