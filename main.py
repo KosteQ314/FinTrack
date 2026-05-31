@@ -24,6 +24,10 @@ def get_prompt():
 
 # Prints a report of the session's transactions and players.
 def print_report(session):
+    GREEN = "\033[32m"
+    RED = "\033[31m"
+    RESET = "\033[0m"
+
     width = 60
     all_amounts = [session.total_income, session.total_expenses, session.net_profit]
     all_amounts += [t.amount for t in session.transactions]
@@ -43,19 +47,22 @@ def print_report(session):
     if session.transactions:
         print("\nTransactions:")
         for t in session.transactions:
-            symbol = "+" if t.type == TransactionType.INCOME else "-"
+            if t.type == TransactionType.INCOME:
+                symbol = f"{GREEN}+{RESET}"
+            else:
+                symbol = f"{RED}-{RESET}"
             print(
-                f"  [{symbol}] {t.description:<{desc_width}} {t.amount:>{amt_width},.2f} aUEC"
+                f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.2f} aUEC"
             )
     else:
         print("\n  No transactions yet.")
 
     print("\n" + "─" * width)
     print(
-        f"  {'Income:':<{desc_width + 4}} {session.total_income:>{amt_width},.2f} aUEC"
+        f"  {'Income:':<{desc_width + 4}} {GREEN}{session.total_income:>{amt_width},.2f}{RESET} aUEC"
     )
     print(
-        f"  {'Expenses:':<{desc_width + 4}} {session.total_expenses:>{amt_width},.2f} aUEC"
+        f"  {'Expenses:':<{desc_width + 4}} {RED}{session.total_expenses:>{amt_width},.2f}{RESET} aUEC"
     )
     print(
         f"  {'Net profit:':<{desc_width + 4}} {session.net_profit:>{amt_width},.2f} aUEC"
@@ -64,6 +71,8 @@ def print_report(session):
     split = session.calculate_split()
     if split:
         print("\n" + "─" * width)
+        print(f"│{'Splits':^{width - 2}}│")
+        print("─" * width)
         print(f"  {'Player':<{desc_width + 4}} {'Share':>{amt_width + 5}}")
         print("─" * width)
         for name, amount in split.items():
@@ -101,6 +110,7 @@ def handle_command(parts):
       expense <desc> <amount>       record an expense
       report                        show session report
       split <mode> <name>:<value>   split income
+        equal = e, percentage = p, fixed = f
       quit                          exit
 
     Aliases:
@@ -252,12 +262,12 @@ def handle_command(parts):
 
         mode = parts[1]
 
-        if mode == "equal":
+        if mode in ("equal", "e"):
             s.split_config = SplitConfig(mode="equal", overrides={})
             save_session(s)
             print("Split set: equal among all players.")
 
-        elif mode == "percentage":
+        elif mode in ("percentage", "p"):
             overrides = {}
             for pair in parts[2:]:
                 name, pct = pair.split(":")
@@ -272,7 +282,7 @@ def handle_command(parts):
                 pct = overrides.get(p.name.lower(), remainder)
                 print(f"  {p.name}: {pct:.1f}%")
 
-        elif mode == "fixed":
+        elif mode in ("fixed", "f"):
             overrides = {}
             for pair in parts[2:]:
                 name, amt = pair.split(":")
