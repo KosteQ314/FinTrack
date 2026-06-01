@@ -120,6 +120,9 @@ def handle_command(parts):
 
     cmd = parts[0].lower()
 
+    if active_session:
+        active_session = get_session(active_session.name)
+
     # Quit command
     if cmd in ("quit", "exit", "q"):
         print("Bye citizen! o7")
