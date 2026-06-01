@@ -24,15 +24,19 @@ def get_prompt():
 
 # Prints a report of the session's transactions and players.
 def print_report(session):
-    GREEN = "\033[32m"
+    GREEN = "\033[92m"
     RED = "\033[31m"
+    FAINT = "\033[2m"
     RESET = "\033[0m"
 
     width = 60
     all_amounts = [session.total_income, session.total_expenses, session.net_profit]
     all_amounts += [t.amount for t in session.transactions]
-    amt_width = max(len(f"{a:,.0f}") for a in all_amounts) if all_amounts else 10
-    desc_width = width - amt_width - 10
+    all_amounts += list(session.calculate_split().values())
+    amt_width = max(len(f"{int(a):,}") for a in all_amounts) if all_amounts else 10
+    pct_width = 6
+    # 2 (indent) + 2 (symbol + space) + desc + 2 (gap) + amt + 5 (" aUEC") = width
+    desc_width = width - 2 - 2 - 2 - amt_width - 5
 
     print("\n" + "─" * width)
     print(f"│{'Session Report':^{width - 2}}│")
@@ -49,36 +53,67 @@ def print_report(session):
         for t in session.transactions:
             symbol = "+" if t.type == TransactionType.INCOME else "-"
             color = GREEN if t.type == TransactionType.INCOME else RED
-            line = f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.0f} aUEC"
-            # colour only the symbol character, index 2
-            print(line[:2] + color + line[2] + RESET + line[3:])
+            amt_str = f"{t.amount:>{amt_width},} aUEC"
+            desc_str = f"{t.description:<{desc_width}}"
+            print(f"  {color}{symbol}{RESET} {desc_str}  {amt_str}")
     else:
         print("\n  No transactions yet.")
 
-    income_str = f"{session.total_income:>{amt_width},.0f}"
-    expenses_str = f"{session.total_expenses:>{amt_width},.0f}"
-    net_str = f"{session.net_profit:>{amt_width},.0f}"
+    income_str = f"{session.total_income:>{amt_width},} aUEC"
+    expenses_str = f"{session.total_expenses:>{amt_width},} aUEC"
+    net_str = f"{session.net_profit:>{amt_width},} aUEC"
+    label_width = desc_width + 2
 
     print("\n" + "─" * width)
-    print(f"  {'Income:':<{desc_width + 4}} {GREEN}{income_str}{RESET} aUEC")
-    print(f"  {'Expenses:':<{desc_width + 4}} {RED}{expenses_str}{RESET} aUEC")
-    print(f"  {'Net profit:':<{desc_width + 4}} {net_str} aUEC")
+    print(f"  {'Income:':<{label_width}}  {GREEN}{income_str}{RESET}")
+    print(f"  {'Expenses:':<{label_width}}  {RED}{expenses_str}{RESET}")
+    print(f"  {'Net profit:':<{label_width}}  {net_str}")
 
     split = session.calculate_split()
     if split:
+        total = sum(split.values())
+        # split columns: 2 indent + desc + 2 gap + pct_width + 2 gap + amt + 5 aUEC
+        split_desc_width = width - 2 - 2 - pct_width - 2 - amt_width - 5
         print("\n" + "─" * width)
         print(f"│{'Splits':^{width - 2}}│")
         print("─" * width)
-        print(f"  {'Player':<{desc_width + 4}} {'Share':>{amt_width + 5}}")
+        header_pct = f"{'%':>{pct_width}}"
+        header_amt = f"{'Share':>{amt_width + 5}}"
+        print(f"  {'Player':<{split_desc_width}}  {header_pct}  {header_amt}")
         print("─" * width)
         for name, amount in split.items():
-            print(f"  {name:<{desc_width + 4}} {amount:>{amt_width},.0f} aUEC")
+            pct = (amount / total * 100) if total else 0
+            pct_str = f"{pct:.1f}%"
+            amt_str = f"{amount:>{amt_width},} aUEC"
+            print(
+                f"  {name:<{split_desc_width}}  {FAINT}{pct_str:>{pct_width}}{RESET}  {amt_str}"
+            )
 
     print("─" * width + "\n")
 
 
 # Handles the user's command.
 def handle_command(parts):
+    # Defines color codes
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    BLACK = "\033[30m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+    B_BLACK = "\033[90m"
+    B_RED = "\033[91m"
+    B_GREEN = "\033[92m"
+    B_YELLOW = "\033[93m"
+    B_BLUE = "\033[94m"
+    B_MAGENTA = "\033[95m"
+    B_CYAN = "\033[96m"
+    B_WHITE = "\033[97m"
+
     global active_session
     if not parts:
         return
@@ -92,37 +127,37 @@ def handle_command(parts):
 
     # Help command
     elif cmd in ("help", "h", "?"):
-        print("""
+        print(f"""
     Commands:
-      help                          show this help message
-      new <name>                    create a new session
-      use <name>                    set active session
-      unuse                         clear active session
-      delete <name>                 delete a session
-      list                          show all sessions
-      add-player <name>             add a player to active session
-      remove-player <name>          remove a player from active session
-      income <desc> <amount>        record income
-      expense <desc> <amount>       record an expense
-      show <mode>                   show active session details
-      report                        show session report
-      split <mode> <name>:<value>   split income
-      quit                          exit
+      {B_CYAN}help{RESET}                          show this help message
+      {B_CYAN}new <name>{RESET}                    create a new session
+      {B_CYAN}use <name>{RESET}                    set active session
+      {B_CYAN}unuse{RESET}                         clear active session
+      {B_CYAN}delete <name>{RESET}                 delete a session
+      {B_CYAN}list{RESET}                          show all sessions
+      {B_CYAN}add-player <name>{RESET}             add a player to active session
+      {B_CYAN}remove-player <name>{RESET}          remove a player from active session
+      {B_CYAN}income <desc> <amount>{RESET}        record income
+      {B_CYAN}expense <desc> <amount>{RESET}       record an expense
+      {B_CYAN}show <mode>{RESET}                   show active session details
+      {B_CYAN}report{RESET}                        show session report
+      {B_CYAN}split <mode> <name>:<value>{RESET}   split income
+      {B_CYAN}quit{RESET}                          exit
 
     Aliases:
-      help                          h, ?
-      delete                        del
-      list                          ls
-      add-player                    addp
-      remove-player                 rmp
-      income                        inc, i
-      expense                       exp, e
-      show                          s
+      {B_CYAN}help{RESET}                          h, ?
+      {B_CYAN}delete{RESET}                        del
+      {B_CYAN}list{RESET}                          ls
+      {B_CYAN}add-player{RESET}                    addp
+      {B_CYAN}remove-player{RESET}                 rmp
+      {B_CYAN}income{RESET}                        inc, i
+      {B_CYAN}expense{RESET}                       exp, e
+      {B_CYAN}show{RESET}                          s
         player = p, transactions = t
-      report                        rep, r
-      split                         sp
+      {B_CYAN}report{RESET}                        rep, r
+      {B_CYAN}split{RESET}                         sp
         equal = e, percentage = p, fixed = f
-      quit                          exit, q
+      {B_CYAN}quit{RESET}                          exit, q
 
     """)
 
@@ -221,7 +256,7 @@ def handle_command(parts):
             return
         s.transactions.append(Transaction(parts[1], amount, TransactionType.INCOME))
         save_session(s)
-        print(f"Added income: {parts[1]} — {amount}")
+        print(f"Added income: {parts[1]}   {B_GREEN}{amount}{RESET}")
 
     # Add expense
     elif cmd in ("expense", "exp", "e"):
@@ -237,7 +272,7 @@ def handle_command(parts):
             return
         s.transactions.append(Transaction(parts[1], amount, TransactionType.EXPENSE))
         save_session(s)
-        print(f"Added expense: {parts[1]} — {amount}")
+        print(f"Added expense: {parts[1]}   {RED}{amount}{RESET}")
 
     # Session Details
     elif cmd in ("show", "s"):
@@ -271,7 +306,7 @@ def handle_command(parts):
                 for t in s.transactions:
                     symbol = "+" if t.type == TransactionType.INCOME else "-"
                     color = (
-                        "\033[32m" if t.type == TransactionType.INCOME else "\033[31m"
+                        "\033[92m" if t.type == TransactionType.INCOME else "\033[31m"
                     )
                     reset = "\033[0m"
                     line = f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.0f} aUEC  (id: {t.id})"
@@ -349,6 +384,19 @@ def handle_command(parts):
 
 # Main loop of the application.
 def main():
+    GOLD = "\033[33m"
+    BLUE = "\033[36m"
+    RESET = "\033[0m"
+
+    print(f"""{BLUE}
+        ███████╗██╗███╗   ██╗████████╗██████╗  █████╗  ██████╗██╗  ██╗
+        ██╔════╝██║████╗  ██║╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝
+        █████╗  ██║██╔██╗ ██║   ██║   ██████╔╝███████║██║     █████╔╝
+        ██╔══╝  ██║██║╚██╗██║   ██║   ██╔══██╗██╔══██║██║     ██╔═██╗
+        ██║     ██║██║ ╚████║   ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗
+        ╚═╝     ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝{GOLD}
+       ╚═══════════════  Star Citizen Finance Tracker  ═══════════════╝{RESET}
+        """)
     print("FinTrack — type 'help' for commands, 'quit' to exit.")
     while True:
         try:
