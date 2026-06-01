@@ -104,9 +104,9 @@ def handle_command(parts):
       remove-player <name>          remove a player from active session
       income <desc> <amount>        record income
       expense <desc> <amount>       record an expense
+      show <mode>                   show active session details
       report                        show session report
       split <mode> <name>:<value>   split income
-        equal = e, percentage = p, fixed = f
       quit                          exit
 
     Aliases:
@@ -117,8 +117,11 @@ def handle_command(parts):
       remove-player                 rmp
       income                        inc, i
       expense                       exp, e
+      show                          s
+        player = p, transactions = t
       report                        rep, r
       split                         sp
+        equal = e, percentage = p, fixed = f
       quit                          exit, q
 
     """)
@@ -235,6 +238,48 @@ def handle_command(parts):
         s.transactions.append(Transaction(parts[1], amount, TransactionType.EXPENSE))
         save_session(s)
         print(f"Added expense: {parts[1]} — {amount}")
+
+    # Session Details
+    elif cmd in ("show", "s"):
+        s = active_session
+        if not s:
+            print("No active session. Use 'use <name>' first.")
+            return
+        if len(parts) < 2:
+            print("Usage: show players | show transactions")
+            return
+
+        sub = parts[1].lower()
+
+        if sub in ("players", "p"):
+            if not s.players:
+                print("No players in this session.")
+            else:
+                print("\nPlayers:")
+                for p in s.players:
+                    print(f"  {p.name} (id: {p.id})")
+                print()
+
+        elif sub in ("transactions", "t"):
+            if not s.transactions:
+                print("No transactions in this session.")
+            else:
+                all_amounts = [t.amount for t in s.transactions]
+                amt_width = max(len(f"{a:,.0f}") for a in all_amounts)
+                desc_width = 40 - amt_width
+                print("\nTransactions:")
+                for t in s.transactions:
+                    symbol = "+" if t.type == TransactionType.INCOME else "-"
+                    color = (
+                        "\033[32m" if t.type == TransactionType.INCOME else "\033[31m"
+                    )
+                    reset = "\033[0m"
+                    line = f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.0f} aUEC  (id: {t.id})"
+                    print(line[:2] + color + line[2] + reset + line[3:])
+                print()
+
+        else:
+            print(f"Unknown option '{sub}'. Use 'show players' or 'show transactions'.")
 
     # Session report
     elif cmd in ("report", "rep", "r"):
