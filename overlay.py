@@ -9,6 +9,7 @@ try:
     from PyQt6.QtGui import QIcon
     from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
+    from core.config import get as get_config
     from core.models import Transaction, TransactionType
     from core.storage import get_session, list_sessions, save_session
     from gui.overlay import OverlayWindow
@@ -18,9 +19,10 @@ except Exception as e:
     input("Press enter to exit...")
     sys.exit(1)
 
-try:
-    HOTKEY = "f9"
+HOTKEY = get_config("hotkey")
+WAKE_WORD = get_config("wake_word")
 
+try:
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
