@@ -28,12 +28,8 @@ try:
 
     window = OverlayWindow()
 
-    sessions = list_sessions()
-    session = sessions[0] if sessions else None
-    if session:
-        window.set_session(session.name)
-    else:
-        window.set_session("No active session")
+    session = None
+    window.set_session("No active session")
 
     def on_transaction(desc, amount, t_type):
         global session
