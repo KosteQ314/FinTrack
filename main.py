@@ -9,7 +9,7 @@ active_session = None
 # Command error crash prevention
 def parse_amount(value):
     try:
-        return float(value)
+        return int(float(value))  # float first to handle "5000.5", then round down
     except ValueError:
         print(f"'{value}' isn't a valid amount.")
         return None
@@ -31,7 +31,7 @@ def print_report(session):
     width = 60
     all_amounts = [session.total_income, session.total_expenses, session.net_profit]
     all_amounts += [t.amount for t in session.transactions]
-    amt_width = max(len(f"{a:,.2f}") for a in all_amounts) if all_amounts else 10
+    amt_width = max(len(f"{a:,.0f}") for a in all_amounts) if all_amounts else 10
     desc_width = width - amt_width - 10
 
     print("\n" + "─" * width)
@@ -49,15 +49,15 @@ def print_report(session):
         for t in session.transactions:
             symbol = "+" if t.type == TransactionType.INCOME else "-"
             color = GREEN if t.type == TransactionType.INCOME else RED
-            line = f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.2f} aUEC"
+            line = f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.0f} aUEC"
             # colour only the symbol character, index 2
             print(line[:2] + color + line[2] + RESET + line[3:])
     else:
         print("\n  No transactions yet.")
 
-    income_str = f"{session.total_income:>{amt_width},.2f}"
-    expenses_str = f"{session.total_expenses:>{amt_width},.2f}"
-    net_str = f"{session.net_profit:>{amt_width},.2f}"
+    income_str = f"{session.total_income:>{amt_width},.0f}"
+    expenses_str = f"{session.total_expenses:>{amt_width},.0f}"
+    net_str = f"{session.net_profit:>{amt_width},.0f}"
 
     print("\n" + "─" * width)
     print(f"  {'Income:':<{desc_width + 4}} {GREEN}{income_str}{RESET} aUEC")
@@ -72,7 +72,7 @@ def print_report(session):
         print(f"  {'Player':<{desc_width + 4}} {'Share':>{amt_width + 5}}")
         print("─" * width)
         for name, amount in split.items():
-            print(f"  {name:<{desc_width + 4}} {amount:>{amt_width},.2f} aUEC")
+            print(f"  {name:<{desc_width + 4}} {amount:>{amt_width},.0f} aUEC")
 
     print("─" * width + "\n")
 

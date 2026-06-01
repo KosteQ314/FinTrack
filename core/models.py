@@ -13,7 +13,7 @@ class TransactionType(Enum):
 @dataclass
 class Transaction:
     description: str
-    amount: float
+    amount: int
     type: TransactionType
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:8])
 
