@@ -37,7 +37,7 @@ def print_report(session):
     print("\n" + "─" * width)
     print(f"│{'Session Report':^{width - 2}}│")
     print("─" * width)
-    print(f"  Session: {session.name}\n")
+    print(f" Session: {session.name}\n")
 
     if session.players:
         print(" Players:")
@@ -45,28 +45,24 @@ def print_report(session):
             print(f"  {p.name}")
 
     if session.transactions:
-        print("\nTransactions:")
+        print("\n Transactions:")
         for t in session.transactions:
-            if t.type == TransactionType.INCOME:
-                symbol = f"{GREEN}+{RESET}"
-            else:
-                symbol = f"{RED}-{RESET}"
-            print(
-                f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.2f} aUEC"
-            )
+            symbol = "+" if t.type == TransactionType.INCOME else "-"
+            color = GREEN if t.type == TransactionType.INCOME else RED
+            line = f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.2f} aUEC"
+            # colour only the symbol character, index 2
+            print(line[:2] + color + line[2] + RESET + line[3:])
     else:
         print("\n  No transactions yet.")
 
+    income_str = f"{session.total_income:>{amt_width},.2f}"
+    expenses_str = f"{session.total_expenses:>{amt_width},.2f}"
+    net_str = f"{session.net_profit:>{amt_width},.2f}"
+
     print("\n" + "─" * width)
-    print(
-        f"  {'Income:':<{desc_width + 4}} {GREEN}{session.total_income:>{amt_width},.2f}{RESET} aUEC"
-    )
-    print(
-        f"  {'Expenses:':<{desc_width + 4}} {RED}{session.total_expenses:>{amt_width},.2f}{RESET} aUEC"
-    )
-    print(
-        f"  {'Net profit:':<{desc_width + 4}} {session.net_profit:>{amt_width},.2f} aUEC"
-    )
+    print(f"  {'Income:':<{desc_width + 4}} {GREEN}{income_str}{RESET} aUEC")
+    print(f"  {'Expenses:':<{desc_width + 4}} {RED}{expenses_str}{RESET} aUEC")
+    print(f"  {'Net profit:':<{desc_width + 4}} {net_str} aUEC")
 
     split = session.calculate_split()
     if split:
