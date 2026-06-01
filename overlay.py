@@ -5,7 +5,7 @@ try:
     import threading
 
     import keyboard
-    from PyQt6.QtCore import Qt
+    from PyQt6.QtCore import QObject, Qt, pyqtSignal
     from PyQt6.QtGui import QIcon
     from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
@@ -24,11 +24,18 @@ except Exception as e:
 HOTKEY = get_config("hotkey")
 WAKE_WORD = get_config("wake_word")
 
+
+class VoiceBridge(QObject):
+    command_ready = pyqtSignal(str, int, str)
+
+
 try:
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
     window = OverlayWindow()
+    toast = ToastNotification(timeout=get_config("voice_cancel_timeout") * 1000)
+    voice_bridge = VoiceBridge()
 
     session = None
     window.set_session("No active session")
@@ -50,15 +57,18 @@ try:
 
     window.transaction_submitted.connect(on_transaction)
 
-    toast = ToastNotification(timeout=get_config("voice_cancel_timeout") * 1000)
-
     def on_voice_command(command):
-        global session
         if not session:
             return
         desc = command["desc"].title()
         amount = command["amount"]
         t_type = command["type"]
+        voice_bridge.command_ready.emit(desc, amount, t_type)
+
+    def on_voice_command_main(desc, amount, t_type):
+        global session
+        if not session:
+            return
         label = "Income" if t_type == "income" else "Expense"
         message = f"{label}: {desc} — {amount:,} aUEC"
 
@@ -82,6 +92,8 @@ try:
             )
 
         toast.show_message(message, on_confirmed=save_it)
+
+    voice_bridge.command_ready.connect(on_voice_command_main)
 
     voice_mode = get_config("voice_mode")
     voice = VoiceListener(on_command=on_voice_command)
