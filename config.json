@@ -1,0 +1,6 @@
+{
+  "hotkey": "f9",
+  "wake_word": "fin",
+  "voice_mode": "always",
+  "voice_cancel_timeout": 5
+}
