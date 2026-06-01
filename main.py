@@ -53,15 +53,15 @@ def print_report(session):
         for t in session.transactions:
             symbol = "+" if t.type == TransactionType.INCOME else "-"
             color = GREEN if t.type == TransactionType.INCOME else RED
-            amt_str = f"{t.amount:>{amt_width},} aUEC"
+            amt_str = f"{int(t.amount):>{amt_width},} aUEC"
             desc_str = f"{t.description:<{desc_width}}"
             print(f"  {color}{symbol}{RESET} {desc_str}  {amt_str}")
     else:
         print("\n  No transactions yet.")
 
-    income_str = f"{session.total_income:>{amt_width},} aUEC"
-    expenses_str = f"{session.total_expenses:>{amt_width},} aUEC"
-    net_str = f"{session.net_profit:>{amt_width},} aUEC"
+    income_str = f"{int(session.total_income):>{amt_width},} aUEC"
+    expenses_str = f"{int(session.total_expenses):>{amt_width},} aUEC"
+    net_str = f"{int(session.net_profit):>{amt_width},} aUEC"
     label_width = desc_width + 2
 
     print("\n" + "─" * width)
@@ -84,7 +84,7 @@ def print_report(session):
         for name, amount in split.items():
             pct = (amount / total * 100) if total else 0
             pct_str = f"{pct:.1f}%"
-            amt_str = f"{amount:>{amt_width},} aUEC"
+            amt_str = f"{int(amount):>{amt_width},} aUEC"
             print(
                 f"  {name:<{split_desc_width}}  {FAINT}{pct_str:>{pct_width}}{RESET}  {amt_str}"
             )
@@ -139,6 +139,8 @@ def handle_command(parts):
       {B_CYAN}remove-player <name>{RESET}          remove a player from active session
       {B_CYAN}income <desc> <amount>{RESET}        record income
       {B_CYAN}expense <desc> <amount>{RESET}       record an expense
+      {B_CYAN}remove-transaction <id>{RESET}       remove a transaction
+
       {B_CYAN}show <mode>{RESET}                   show active session details
       {B_CYAN}report{RESET}                        show session report
       {B_CYAN}split <mode> <name>:<value>{RESET}   split income
@@ -152,6 +154,7 @@ def handle_command(parts):
       {B_CYAN}remove-player{RESET}                 rmp
       {B_CYAN}income{RESET}                        inc, i
       {B_CYAN}expense{RESET}                       exp, e
+      {B_CYAN}remove-transaction{RESET}            rmt
       {B_CYAN}show{RESET}                          s
         player = p, transactions = t
       {B_CYAN}report{RESET}                        rep, r
@@ -273,6 +276,23 @@ def handle_command(parts):
         s.transactions.append(Transaction(parts[1], amount, TransactionType.EXPENSE))
         save_session(s)
         print(f"Added expense: {parts[1]}   {RED}{amount}{RESET}")
+
+    # Remove transaction
+    elif cmd in ("remove-transaction", "rmt"):
+        s = active_session
+        if not s:
+            print("No active session. Use 'use <name>' first.")
+            return
+        if len(parts) < 2:
+            print("Usage: remove-transaction <id>")
+            return
+        before = len(s.transactions)
+        s.transactions = [t for t in s.transactions if t.id != parts[1]]
+        if len(s.transactions) == before:
+            print(f"No transaction with id '{parts[1]}'.")
+            return
+        save_session(s)
+        print(f"Removed transaction '{parts[1]}'.")
 
     # Session Details
     elif cmd in ("show", "s"):
