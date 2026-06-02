@@ -7,6 +7,7 @@ DEFAULTS = {
     "hotkey": "f9",
     "wake_word": "fin",
     "voice_mode": "always",
+    "voice_hotkey": "f8",
     "voice_cancel_timeout": 5,
 }
 
