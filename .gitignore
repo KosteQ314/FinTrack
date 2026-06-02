@@ -6,3 +6,4 @@ setup.py
 setup.spec
 setup.exe
 build
+dist
