@@ -120,8 +120,8 @@ try:
             voice.stop()
             set_config("voice_mode", "hotkey")
         else:
-            voice.start()
             set_config("voice_mode", "always")
+            voice.start()
         tray.setContextMenu(build_tray_menu())
 
     def build_tray_menu():
@@ -169,7 +169,26 @@ try:
     tray.show()
 
     def hotkey_thread():
+        voice_hotkey = get_config("voice_hotkey")
+        print(f"Voice hotkey registered: {voice_hotkey}")
+        print(f"Voice mode: {get_config('voice_mode')}")
+
         keyboard.add_hotkey(HOTKEY, lambda: window.show_requested.emit())
+        keyboard.on_press_key(
+            voice_hotkey,
+            lambda _: (
+                print("PTT pressed")
+                or (voice.start() if get_config("voice_mode") == "hotkey" else None)
+            ),
+        )
+        keyboard.on_release_key(
+            voice_hotkey,
+            lambda _: (
+                print("PTT released")
+                or (voice.stop() if get_config("voice_mode") == "hotkey" else None)
+            ),
+        )
+
         try:
             keyboard.wait()
         except KeyboardInterrupt:

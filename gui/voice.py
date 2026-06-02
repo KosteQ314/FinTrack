@@ -181,6 +181,7 @@ class VoiceListener:
         self._q.put(bytes(indata))
 
     def _listen(self):
+        print("_listen thread running")
         rec = vosk.KaldiRecognizer(self.model, 16000)
         with sd.RawInputStream(
             samplerate=16000,
@@ -189,8 +190,11 @@ class VoiceListener:
             channels=1,
             callback=self._callback,
         ):
+            print("Microphone stream open")
             while self.active:
                 data = self._q.get()
+                if not data:
+                    break
                 if rec.AcceptWaveform(data):
                     result = json.loads(rec.Result())
                     text = result.get("text", "")
@@ -201,10 +205,28 @@ class VoiceListener:
                         if command:
                             self.on_command(command)
 
+            # flush final result when PTT released
+            result = json.loads(rec.FinalResult())
+            text = result.get("text", "")
+            print(f"Final heard: '{text}'")
+            if text:
+                command = self._parse_command(text)
+                print(f"Final parsed: {command}")
+                if command:
+                    self.on_command(command)
+
     def start(self):
+        if self.active:
+            return
         self.active = True
+        self._q = queue.Queue()
         self._thread = threading.Thread(target=self._listen, daemon=True)
         self._thread.start()
+        print("Voice listening started")
 
     def stop(self):
+        if not self.active:
+            return
         self.active = False
+        self._q.put(b"")  # ← unblock the queue so the thread can exit cleanly
+        print("Voice listening stopped")
