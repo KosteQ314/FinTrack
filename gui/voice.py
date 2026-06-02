@@ -10,17 +10,21 @@ from core.config import get as get_config
 
 KNOWN_DESCRIPTIONS = [
     "refuel",
+    "re-fuel",
     "fuel",
     "repair",
     "repairs",
     "rearm",
+    "fee",
+    "contract",
+    "trade",
+    "trading",
     "cargo",
     "bounty",
+    "mercenary",
     "salvage",
     "mining",
     "delivery",
-    "fee",
-    "insurance",
 ]
 
 WAKE_WORD_VARIANTS = ["fin", "finn", "pin", "bin", "been", "then"]
