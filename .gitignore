@@ -2,3 +2,7 @@ git-conventional-commits.yaml
 test.py
 escape.py
 __pycache__
+setup.py
+setup.spec
+setup.exe
+build
