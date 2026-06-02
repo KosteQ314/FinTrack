@@ -28,6 +28,7 @@
 
 ### BREAKING CHANGES
 -  add voice control (5e9a174d4ae0d1c81883162eb189d4932985ab7e)
+
 <br>
 
 # **1.1.0-alpha**&emsp;<sub><sup>2026-06-01 (66ec12397d79f99b6fd936b9574eb888bb419946...431faf48aaa4c442a7f4bb2767a5f7130f7e6c0e)</sup></sub>
