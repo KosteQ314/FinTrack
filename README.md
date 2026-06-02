@@ -17,6 +17,10 @@ Track income, expenses and profits across Star Citizen with a financial manageme
 
 The roadmap will be updated as the project progresses and more features might be added based on the recommendations as well as my personal ideas, what is currently here are the basic features that I want to implement first.
 
+## Installation
+
+To install FinTrack, download the latest [release](https://github.com/KosteQ314/FinTrack/releases) and run `pip install -r requirements.txt`.
+
 ## Contributing
 
 **Contributions are definitely welcome** as I'm doing it fully alone currently and my current programming knowledge is scarce.
