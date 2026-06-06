@@ -1,3 +1,17 @@
+## **2.0.0-rc.1**&emsp;<sub><sup>2026-06-06 (66ec12397d79f99b6fd936b9574eb888bb419946...33e7a29c4246c6c229626c13af9ebb28b3459cb2)</sup></sub>
+
+### Features
+
+- add an app and expanded GUI (33e7a29c4246c6c229626c13af9ebb28b3459cb2)
+
+##### &ensp;`change`
+
+- remove windows notifications, use our own (43f7ec9cc9f39b9322d70c6b972f1b26199cd0da)
+
+### BREAKING CHANGES
+-  add an app and expanded GUI (33e7a29c4246c6c229626c13af9ebb28b3459cb2)
+<br>
+
 ## **2.0.0-alpha**&emsp;<sub><sup>2026-06-02 (66ec12397d79f99b6fd936b9574eb888bb419946...c0cc4bf55e7aa209eaab9bcf3b381b4c03ec41f9)</sup></sub>
 
 ### Features
