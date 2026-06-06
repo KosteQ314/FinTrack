@@ -8,6 +8,7 @@ DEFAULTS = {
     "wake_word": "fin",
     "voice_mode": "always",
     "voice_hotkey": "f8",
+    "app_toggle_hotkey": "f7",
     "voice_cancel_timeout": 5,
 }
 
