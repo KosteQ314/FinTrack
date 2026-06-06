@@ -84,12 +84,6 @@ try:
             session.transactions.append(t)
             save_session(session)
             session = get_session(session.name)
-            tray.showMessage(
-                "FinTrack",
-                f"Logged: {message}",
-                QSystemTrayIcon.MessageIcon.Information,
-                2000,
-            )
 
         toast.show_message(message, on_confirmed=save_it)
 
@@ -157,12 +151,7 @@ try:
         window.set_session(session.name)
         tray.setToolTip(f"FinTrack — {session.name}")
         tray.setContextMenu(build_tray_menu())
-        tray.showMessage(
-            "FinTrack",
-            f"Switched to '{session.name}'",
-            QSystemTrayIcon.MessageIcon.Information,
-            2000,
-        )
+        toast.show_message(f"Switched to '{session.name}'", on_confirmed=lambda: None)
 
     tray.setToolTip(f"FinTrack — {session.name if session else 'No session'}")
     tray.setContextMenu(build_tray_menu())
