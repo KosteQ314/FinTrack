@@ -1,0 +1,6 @@
+PyQt6
+keyboard
+vosk
+sounddevice
+Pillow
+rapidfuzz

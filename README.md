@@ -13,12 +13,20 @@ Track income, expenses and profits across Star Citizen with a financial manageme
 
 - [x] Transaction tracking
 - [x] Player income splitting
-- [ ] GUI
-- [ ] Voice recognition
-- [ ] Overlay
-- [ ] App
+- [x] Voice Control
+- [x] Overlay
+- [x] GUI
+- [x] App
+- [ ] Transaction timestamps
+- [ ] .CSV export
+- [ ] Installer
 
 The roadmap will be updated as the project progresses and more features might be added based on the recommendations as well as my personal ideas, what is currently here are the basic features that I want to implement first.
+
+## Installation
+
+To install FinTrack, download the latest [release](https://github.com/KosteQ314/FinTrack/releases) and run `pip install -r requirements.txt`.
+A proper installer will be available soon.
 
 ## Contributing
 
