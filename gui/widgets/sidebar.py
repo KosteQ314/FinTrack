@@ -223,16 +223,61 @@ class SidebarWidget(QWidget):
 
     def _show_session_picker(self):
         sessions = list_sessions()
-        if not sessions:
-            QMessageBox.information(
-                self, "No sessions", "No sessions found. Create one in the CLI first."
-            )
-            return
-        names = [s.name for s in sessions]
+        names = [s.name for s in sessions] if sessions else []
+        names.append("+ New session")
+        names.append("− Remove session")
+
         name, ok = QInputDialog.getItem(
-            self, "Switch session", "Select session:", names, 0, False
+            self, "Sessions", "Select, create or remove:", names, 0, False
         )
-        if ok and name:
+        if not ok or not name:
+            return
+
+        if name == "+ New session":
+            new_name, ok2 = QInputDialog.getText(self, "New session", "Session name:")
+            if not ok2 or not new_name.strip():
+                return
+            from core.storage import get_session as _get
+
+            if _get(new_name.strip()):
+                QMessageBox.warning(
+                    self, "Already exists", f"'{new_name.strip()}' already exists."
+                )
+                return
+            from core.models import Session
+
+            session = Session(name=new_name.strip())
+            save_session(session)
+            if self.on_session_change:
+                self.on_session_change(session)
+
+        elif name == "− Remove session":
+            remove_names = [s.name for s in sessions]
+            rem_name, ok2 = QInputDialog.getItem(
+                self,
+                "Remove session",
+                "Select session to remove:",
+                remove_names,
+                0,
+                False,
+            )
+            if not ok2 or not rem_name:
+                return
+            confirm = QMessageBox.question(
+                self,
+                "Confirm",
+                f"Delete '{rem_name}'? This cannot be undone.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
+            if confirm == QMessageBox.StandardButton.Yes:
+                from core.storage import delete_session
+
+                delete_session(rem_name)
+                if self.session and self.session.name == rem_name:
+                    if self.on_session_change:
+                        self.on_session_change(None)
+
+        else:
             session = next((s for s in sessions if s.name == name), None)
             if session and self.on_session_change:
                 self.on_session_change(session)
