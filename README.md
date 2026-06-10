@@ -17,6 +17,9 @@ Track income, expenses and profits across Star Citizen with a financial manageme
 - [x] Overlay
 - [x] GUI
 - [x] App
+- [ ] Transaction timestamps
+- [ ] .CSV export
+- [ ] Installer
 
 The roadmap will be updated as the project progresses and more features might be added based on the recommendations as well as my personal ideas, what is currently here are the basic features that I want to implement first.
 
