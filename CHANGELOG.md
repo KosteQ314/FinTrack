@@ -1,3 +1,20 @@
+## **2.0.0**&emsp;<sub><sup>2026-06-10 (66ec12397d79f99b6fd936b9574eb888bb419946...f34529ec9b801f921b057599d83f2674099501c1)</sup></sub>
+
+### Features
+
+- add session create/remove from session picker dialog (2da8680239a86544f4ee9244462ae1ac98a73900)
+
+### Bug Fixes
+
+- clean up debug logs in hotkey thread (2f34c1bf61d98bb91d59909b58996b90d9dc8def)
+- sync session state in standalone app launcher (3f0bb0b6f5677a7d1399f1b3e4010cd588d932cb)
+
+### Performance Improvements
+
+- add more known descriptions (f34529ec9b801f921b057599d83f2674099501c1)
+
+<br>
+
 ## **2.0.0-rc.1**&emsp;<sub><sup>2026-06-06 (66ec12397d79f99b6fd936b9574eb888bb419946...33e7a29c4246c6c229626c13af9ebb28b3459cb2)</sup></sub>
 
 ### Features
