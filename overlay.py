@@ -5,7 +5,7 @@ try:
     import threading
 
     import keyboard
-    from PyQt6.QtCore import QObject, Qt, pyqtSignal
+    from PyQt6.QtCore import QObject, pyqtSignal
     from PyQt6.QtGui import QIcon
     from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
@@ -22,7 +22,6 @@ except Exception as e:
     sys.exit(1)
 
 HOTKEY = get_config("hotkey")
-WAKE_WORD = get_config("wake_word")
 
 
 class VoiceBridge(QObject):
@@ -60,10 +59,9 @@ try:
     def on_voice_command(command):
         if not session:
             return
-        desc = command["desc"].title()
-        amount = command["amount"]
-        t_type = command["type"]
-        voice_bridge.command_ready.emit(desc, amount, t_type)
+        voice_bridge.command_ready.emit(
+            command["desc"].title(), command["amount"], command["type"]
+        )
 
     def on_voice_command_main(desc, amount, t_type):
         global session
@@ -91,14 +89,13 @@ try:
 
     voice_mode = get_config("voice_mode")
     voice = VoiceListener(on_command=on_voice_command)
-
     if voice_mode == "always":
         voice.start()
 
     tray = QSystemTrayIcon(QIcon("assets/icon.png"), parent=app)
 
     if not QSystemTrayIcon.isSystemTrayAvailable():
-        print("System tray not available on this system.")
+        print("System tray not available.")
         input("Press enter to exit...")
         sys.exit(1)
     if tray.icon().isNull():
@@ -114,8 +111,8 @@ try:
             voice.stop()
             set_config("voice_mode", "hotkey")
         else:
-            set_config("voice_mode", "always")
             voice.start()
+            set_config("voice_mode", "always")
         tray.setContextMenu(build_tray_menu())
 
     def build_tray_menu():
@@ -159,25 +156,18 @@ try:
 
     def hotkey_thread():
         voice_hotkey = get_config("voice_hotkey")
-        print(f"Voice hotkey registered: {voice_hotkey}")
-        print(f"Voice mode: {get_config('voice_mode')}")
+        print(f"Overlay hotkey: {HOTKEY}")
+        print(f"Voice hotkey: {voice_hotkey} | Mode: {get_config('voice_mode')}")
 
         keyboard.add_hotkey(HOTKEY, lambda: window.show_requested.emit())
         keyboard.on_press_key(
             voice_hotkey,
-            lambda _: (
-                print("PTT pressed")
-                or (voice.start() if get_config("voice_mode") == "hotkey" else None)
-            ),
+            lambda _: voice.start() if get_config("voice_mode") == "hotkey" else None,
         )
         keyboard.on_release_key(
             voice_hotkey,
-            lambda _: (
-                print("PTT released")
-                or (voice.stop() if get_config("voice_mode") == "hotkey" else None)
-            ),
+            lambda _: voice.stop() if get_config("voice_mode") == "hotkey" else None,
         )
-
         try:
             keyboard.wait()
         except KeyboardInterrupt:
