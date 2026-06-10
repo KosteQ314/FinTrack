@@ -16,6 +16,7 @@ KNOWN_DESCRIPTIONS = [
     "repairs",
     "rearm",
     "fee",
+    "refining",
     "rent",
     "rental",
     "loan",
