@@ -60,6 +60,30 @@ class MainPanelWidget(QWidget):
         tx_header.addStretch()
         layout.addLayout(tx_header)
 
+        # search bar
+        search_row = QHBoxLayout()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search transactions...")
+        self.search_input.setStyleSheet(self._input_style())
+        self.search_input.textChanged.connect(self._on_search)
+
+        clear_btn = QPushButton("✕")
+        clear_btn.setFixedSize(28, 28)
+        clear_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+                border: none;
+                color: rgba(255,255,255,80);
+                font-size: 13px;
+            }
+            QPushButton:hover { color: white; }
+        """)
+        clear_btn.clicked.connect(lambda: self.search_input.clear())
+
+        search_row.addWidget(self.search_input, stretch=1)
+        search_row.addWidget(clear_btn)
+        layout.addLayout(search_row)
+
         # transactions scroll area
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -187,10 +211,13 @@ class MainPanelWidget(QWidget):
         self.expenses_card[1].setText(f"{int(self.session.total_expenses):,} aUEC")
         self.net_card[1].setText(f"{int(self.session.net_profit):,} aUEC")
 
-    def _refresh_transactions(self):
+    def _on_search(self, text):
+        self._refresh_transactions(filter_text=text)
+
+    def _refresh_transactions(self, filter_text=""):
         for i in reversed(range(self.tx_layout.count())):
             item = self.tx_layout.itemAt(i)
-            if item.widget():
+            if item and item.widget():
                 item.widget().deleteLater()
 
         if not self.session or not self.session.transactions:
@@ -200,7 +227,20 @@ class MainPanelWidget(QWidget):
             self.tx_layout.addStretch()
             return
 
-        for t in self.session.transactions:  # ← removed reversed()
+        filtered = self.session.transactions
+        if filter_text:
+            filtered = [
+                t for t in filtered if filter_text.lower() in t.description.lower()
+            ]
+
+        if not filtered:
+            empty = QLabel("No transactions match your search")
+            empty.setStyleSheet("color: rgba(200,200,200,60); font-size: 12px;")
+            self.tx_layout.addWidget(empty)
+            self.tx_layout.addStretch()
+            return
+
+        for t in filtered:
             self.tx_layout.addWidget(self._transaction_row(t))
         self.tx_layout.addStretch()
 
@@ -322,6 +362,7 @@ class MainPanelWidget(QWidget):
 
     def update_session(self, session):
         self.session = session
+        self.search_input.clear()
         if self.session_header.isVisible() and session:
             self.session_header.setText(session.name)
         self._refresh_transactions()
