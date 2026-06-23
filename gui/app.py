@@ -142,6 +142,11 @@ class FinTrackApp(QMainWindow):
         bar_layout.addWidget(self.statusLabel)
         bar_layout.addStretch()
 
+        export_btn = QPushButton("⤓ Export CSV")
+        export_btn.setFixedWidth(140)
+        export_btn.clicked.connect(self._export_csv)
+        bar_layout.addWidget(export_btn)
+
         self.toggle_btn = QPushButton("⧉  Overlay mode")
         self.toggle_btn.setFixedWidth(160)
         self.toggle_btn.clicked.connect(self.toggle_overlay_mode)
@@ -176,7 +181,7 @@ class FinTrackApp(QMainWindow):
                 | Qt.WindowType.WindowStaysOnTopHint
                 | Qt.WindowType.Window
             )
-            self.setFixedSize(520, 600)
+            self.setFixedSize(520, 780)
             self.toggle_btn.setText("⧉  App mode")
             self.sidebar.hide()
             self.main_panel_widget.show_session_header(True)
@@ -193,6 +198,52 @@ class FinTrackApp(QMainWindow):
             self.setWindowOpacity(1.0)
         self.show()
         self.activateWindow()  # ← brings focus back to the app when switching to app mode
+
+    def _export_csv(self):
+        if not self.session:
+            self.set_status("No active session to export.")
+            return
+
+        import csv
+        from datetime import datetime
+
+        from PyQt6.QtWidgets import QFileDialog
+
+        default_name = f"{self.session.name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.csv"
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export CSV", default_name, "CSV Files (*.csv)"
+        )
+        if not path:
+            return
+
+        try:
+            with open(path, "w", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                writer.writerow(
+                    ["ID", "Description", "Type", "Amount (aUEC)", "Timestamp"]
+                )
+                for t in self.session.transactions:
+                    writer.writerow(
+                        [t.id, t.description, t.type.value, t.amount, t.timestamp]
+                    )
+                writer.writerow([])
+                writer.writerow(["Summary", "", "", "", ""])
+                writer.writerow(["Income", "", "", self.session.total_income, ""])
+                writer.writerow(["Expenses", "", "", self.session.total_expenses, ""])
+                writer.writerow(["Net Profit", "", "", self.session.net_profit, ""])
+
+                split = self.session.calculate_split()
+                if split:
+                    writer.writerow([])
+                    writer.writerow(["Player Splits", "", "", "", ""])
+                    total = sum(split.values())
+                    for name, amount in split.items():
+                        pct = (amount / total * 100) if total else 0
+                        writer.writerow([name, "", "", int(amount), f"{pct:.1f}%"])
+
+            self.set_status(f"Exported to {path}")
+        except Exception as e:
+            self.set_status(f"Export failed: {e}")
 
     def set_status(self, message):
         self.statusLabel.setText(message)
