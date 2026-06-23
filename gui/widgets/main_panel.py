@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QFrame,
@@ -217,12 +219,13 @@ class MainPanelWidget(QWidget):
             QPushButton {
                 background: transparent;
                 border: none;
-                color: rgba(255,100,100,180);
-                font-size: 16px;
+                color: rgba(255, 80, 80, 200);
+                font-size: 15px;
                 font-weight: bold;
+                padding: 0px;
             }
             QPushButton:hover {
-                color: rgba(255,100,100,255);
+                color: rgba(255, 80, 80, 255);
             }
         """)
         row_layout = QHBoxLayout(row)
@@ -241,9 +244,17 @@ class MainPanelWidget(QWidget):
         desc_label = QLabel(transaction.description)
         desc_label.setStyleSheet("color: #c8d6e8; font-size: 13px;")
 
+        try:
+            dt = datetime.fromisoformat(transaction.timestamp)
+            time_str = dt.strftime("%d %b  %H:%M")
+        except Exception:
+            time_str = ""
+
+        time_label = QLabel(time_str)
+        time_label.setStyleSheet("color: rgba(150,170,200,100); font-size: 10px;")
+
         amt_label = QLabel(f"{int(transaction.amount):,} aUEC")
         amt_label.setStyleSheet(f"color: {color}; font-size: 13px;")
-        amt_label.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         remove_btn = QPushButton("×")
         remove_btn.setFixedSize(22, 22)
@@ -264,6 +275,7 @@ class MainPanelWidget(QWidget):
 
         row_layout.addWidget(symbol_label)
         row_layout.addWidget(desc_label, stretch=1)
+        row_layout.addWidget(time_label)
         row_layout.addWidget(amt_label)
         row_layout.addWidget(remove_btn)
         return row
