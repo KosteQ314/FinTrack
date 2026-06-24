@@ -21,6 +21,8 @@
 
 - reduce bottom bar buton sizes (04cb303b93887d95a38f4cfdc70027e0839ffa9e)
 
+<br>
+
 ## **2.0.0**&emsp;<sub><sup>2026-06-10 (66ec12397d79f99b6fd936b9574eb888bb419946...f34529ec9b801f921b057599d83f2674099501c1)</sup></sub>
 
 ### Features
