@@ -1,3 +1,9 @@
+## **2.1.0**&emsp;<sub><sup>2026-07-01 (adb7e69a6100ea6f4e908e078b79d7f878abec30...38399690d07902b8ca1acf2cb246d09b3da06da6)</sup></sub>
+
+### BREAKING CHANGES
+-  add Inno Setup installer (38399690d07902b8ca1acf2cb246d09b3da06da6)
+<br>
+
 ## **2.1.0-rc1**&emsp;<sub><sup>2026-06-24 (adb7e69a6100ea6f4e908e078b79d7f878abec30...1b5460d252c9f4f9cf2923a3e674fbd0ec54c46e)</sup></sub>
 
 ### Features
