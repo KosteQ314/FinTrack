@@ -1,7 +1,7 @@
 {
   "hotkey": "f9",
   "wake_word": "fin",
-  "voice_mode": "always",
+  "voice_mode": "hotkey",
   "voice_hotkey": "f8",
   "app_toggle_hotkey": "f7",
   "voice_cancel_timeout": 5

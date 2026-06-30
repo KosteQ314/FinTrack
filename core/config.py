@@ -1,7 +1,18 @@
 import json
 import os
+import sys
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
+
+def get_app_dir():
+    if getattr(sys, "frozen", False):
+        # running as a bundled exe — use the folder the exe is in
+        return os.path.dirname(sys.executable)
+    else:
+        # running from source
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+CONFIG_PATH = os.path.join(get_app_dir(), "config.json")
 
 DEFAULTS = {
     "hotkey": "f9",

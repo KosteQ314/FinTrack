@@ -1,3 +1,34 @@
+## **2.1.0**&emsp;<sub><sup>2026-07-01 (adb7e69a6100ea6f4e908e078b79d7f878abec30...38399690d07902b8ca1acf2cb246d09b3da06da6)</sup></sub>
+
+### BREAKING CHANGES
+-  add Inno Setup installer (38399690d07902b8ca1acf2cb246d09b3da06da6)
+<br>
+
+## **2.1.0-rc1**&emsp;<sub><sup>2026-06-24 (adb7e69a6100ea6f4e908e078b79d7f878abec30...1b5460d252c9f4f9cf2923a3e674fbd0ec54c46e)</sup></sub>
+
+### Features
+
+- add timestampt dataclass (abfe191fdc29afbde60aca718f0eb9644ee1fe0a)
+- persist adn load transaction timestamps (03d71d9194bbc3110cd07e5078c7d8662d957b7f)
+- display transaction timestamps in the app (aa6607c5323f6dbf77613c3ae51da56f2869e26a)
+- add search to transaction list (4d5f5622ca9e8916631611cad4712e2a87eb5858)
+
+##### &ensp;`CLI`
+
+- add export command to store session data to CSV (5fa343872f67c1a9bcbd492286da2c605ed1084e)
+
+##### &ensp;`app`
+
+- add CSV export button to the bottom bar (e5f38c23e47dc9cd981861d8eaf6cb7c3486059e)
+
+### Bug Fixes
+
+##### &ensp;`app`
+
+- reduce bottom bar buton sizes (04cb303b93887d95a38f4cfdc70027e0839ffa9e)
+
+<br>
+
 ## **2.0.0**&emsp;<sub><sup>2026-06-10 (66ec12397d79f99b6fd936b9574eb888bb419946...f34529ec9b801f921b057599d83f2674099501c1)</sup></sub>
 
 ### Features

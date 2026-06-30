@@ -1,5 +1,7 @@
 import json
+import os
 import queue
+import sys
 import threading
 
 import sounddevice as sd
@@ -7,6 +9,14 @@ import vosk
 from rapidfuzz import fuzz, process
 
 from core.config import get as get_config
+
+# get correct base path whether running from source or PyInstaller bundle
+if getattr(sys, "frozen", False):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+model_path = os.path.join(BASE_DIR, "vosk-model-small-en-us-0.15")
 
 KNOWN_DESCRIPTIONS = [
     "refuel",
@@ -111,7 +121,7 @@ def clean_description(words):
         if match and match[1] >= MATCH_THRESHOLD:
             result.append(match[0])
         else:
-            return None  # unknown word, reject the command
+            return None
     return " ".join(result).strip() if result else None
 
 
@@ -130,7 +140,6 @@ class VoiceListener:
         self.active = False
         self._thread = None
         self._q = queue.Queue()
-        model_path = "vosk-model-small-en-us-0.15"
         self.model = vosk.Model(model_path)
 
     def _parse_command(self, text):
@@ -213,7 +222,6 @@ class VoiceListener:
                         if command:
                             self.on_command(command)
 
-            # flush final result when PTT released
             result = json.loads(rec.FinalResult())
             text = result.get("text", "")
             print(f"Final heard: '{text}'")
@@ -236,5 +244,5 @@ class VoiceListener:
         if not self.active:
             return
         self.active = False
-        self._q.put(b"")  # ← unblock the queue so the thread can exit cleanly
+        self._q.put(b"")
         print("Voice listening stopped")

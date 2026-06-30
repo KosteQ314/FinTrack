@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 from core.models import Player, Session, SplitConfig, Transaction, TransactionType
 
@@ -72,6 +73,7 @@ def _session_to_dict(session):
                 "description": t.description,
                 "amount": t.amount,
                 "type": t.type.value,
+                "timestamp": t.timestamp,
             }
             for t in session.transactions
         ],
@@ -92,6 +94,7 @@ def _dict_to_session(d):
             amount=t["amount"],
             type=TransactionType(t["type"]),
             id=t["id"],
+            timestamp=t.get("timestamp", datetime.now().isoformat()),
         )
         for t in d["transactions"]
     ]

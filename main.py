@@ -143,9 +143,9 @@ def handle_command(parts):
       {B_CYAN}income <desc> <amount>{RESET}        record income
       {B_CYAN}expense <desc> <amount>{RESET}       record an expense
       {B_CYAN}remove-transaction <id>{RESET}       remove a transaction
-
       {B_CYAN}show <mode>{RESET}                   show active session details
       {B_CYAN}report{RESET}                        show session report
+      {B_CYAN}export{RESET}                        export session data to .csv
       {B_CYAN}split <mode> <name>:<value>{RESET}   split income
       {B_CYAN}quit{RESET}                          exit
 
@@ -346,6 +346,43 @@ def handle_command(parts):
             print("No active session. Use 'use <name>' first.")
             return
         print_report(s)
+
+    # Export to .csv
+    elif cmd == "export":
+        s = active_session
+        if not s:
+            print("No active session. Use 'use <name>' first.")
+            return
+        import csv
+        from datetime import datetime
+
+        filename = f"{s.name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.csv"
+        try:
+            with open(filename, "w", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                writer.writerow(
+                    ["ID", "Description", "Type", "Amount (aUEC)", "Timestamp"]
+                )
+                for t in s.transactions:
+                    writer.writerow(
+                        [t.id, t.description, t.type.value, t.amount, t.timestamp]
+                    )
+                writer.writerow([])
+                writer.writerow(["Summary", "", "", "", ""])
+                writer.writerow(["Income", "", "", s.total_income, ""])
+                writer.writerow(["Expenses", "", "", s.total_expenses, ""])
+                writer.writerow(["Net Profit", "", "", s.net_profit, ""])
+                split = s.calculate_split()
+                if split:
+                    writer.writerow([])
+                    writer.writerow(["Player Splits", "", "", "", ""])
+                    total = sum(split.values())
+                    for name, amount in split.items():
+                        pct = (amount / total * 100) if total else 0
+                        writer.writerow([name, "", "", int(amount), f"{pct:.1f}%"])
+            print(f"Exported to {filename}")
+        except Exception as e:
+            print(f"Export failed: {e}")
 
     # Split income
     elif cmd in ("split", "sp"):

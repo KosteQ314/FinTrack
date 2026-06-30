@@ -1,6 +1,8 @@
 import uuid
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
+from sqlite3.dbapi2 import Timestamp
 
 
 # Transaction types
@@ -16,6 +18,7 @@ class Transaction:
     amount: int
     type: TransactionType
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:8])
+    timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
 # Specifies a player
