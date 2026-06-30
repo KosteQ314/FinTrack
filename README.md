@@ -19,11 +19,18 @@ Track income, expenses and profits across Star Citizen with a financial manageme
 
 ## Installation
 
+### Installer
 Download the latest [release](https://github.com/KosteQ314/FinTrack/releases) and run `FinTrack-Setup.exe`.
 
 The installer includes:
 - **FinTrack App** — full app with GUI, overlay, and voice control (required)
 - **FinTrack CLI** — lightweight command line interface (optional)
+
+### Portable
+Alternatively download the portable versions — extract the zip and run the exe directly, no installation needed.
+
+- `FinTrack.zip` — full app with GUI, overlay, and voice control
+- `FinTrack-CLI.zip` — lightweight command line interface
 
 ### Running from source
 
