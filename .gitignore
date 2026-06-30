@@ -7,4 +7,6 @@ setup.spec
 setup.exe
 build
 dist
+FinTrack.spec
+FinTrack-CLI.spec
 .claude

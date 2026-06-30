@@ -2,6 +2,7 @@ import sys
 import traceback
 
 try:
+    import os
     import threading
 
     import keyboard
@@ -16,6 +17,13 @@ try:
     from gui.overlay import OverlayWindow
     from gui.toast import ToastNotification
     from gui.voice import VoiceListener
+
+    if getattr(sys, "frozen", False):
+        BASE_DIR = sys._MEIPASS
+    else:
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    ICON_PATH = os.path.join(BASE_DIR, "assets", "icon.png")
 except Exception as e:
     print("Import error:")
     traceback.print_exc()
@@ -144,7 +152,7 @@ try:
         voice.start()
 
     # tray
-    tray = QSystemTrayIcon(QIcon("assets/icon.png"), parent=app)
+    tray = QSystemTrayIcon(QIcon(ICON_PATH), parent=app)
 
     if not QSystemTrayIcon.isSystemTrayAvailable():
         print("System tray not available.")
