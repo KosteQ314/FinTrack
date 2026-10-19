@@ -1,6 +1,7 @@
 git-conventional-commits.yaml
 test.py
 test_prices.py
+debug_prices.py
 escape.py
 uex_key.txt
 __pycache__
