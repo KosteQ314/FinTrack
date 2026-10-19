@@ -27,18 +27,22 @@ KNOWN_DESCRIPTIONS = [
     "rearm",
     "fee",
     "refining",
+    "refine",
     "rent",
     "rental",
     "loan",
     "contract",
+    "mission",
     "trade",
     "trading",
     "cargo",
+    "hauling",
     "bounty",
     "mercenary",
     "salvage",
     "mining",
     "delivery",
+    "courier",
 ]
 
 WAKE_WORD_VARIANTS = ["fin", "finn", "pin", "bin", "been", "then"]
