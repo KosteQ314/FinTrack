@@ -1,6 +1,8 @@
 git-conventional-commits.yaml
 test.py
+test_prices.py
 escape.py
+uex_key.txt
 __pycache__
 setup.py
 setup.spec
