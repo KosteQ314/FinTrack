@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import time
+import sys
 import urllib.request
 
 from core.config import get as get_config
@@ -37,6 +38,10 @@ def fetch_raw():
     if payload.get("status") != "ok":
         raise RuntimeError(f"UEX returned status: {payload.get('status')}")
     return payload["data"]
+
+
+def fetch_prices():
+    return _aggregate(fetch_raw())
 
 
 def _aggregate(rows):
