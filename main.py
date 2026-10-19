@@ -159,10 +159,13 @@ def handle_command(parts):
       {B_CYAN}expense{RESET}                       exp, e
       {B_CYAN}remove-transaction{RESET}            rmt
       {B_CYAN}show{RESET}                          s
-        player = p, transactions = t
+        player                                     p
+        transactions                               t
       {B_CYAN}report{RESET}                        rep, r
       {B_CYAN}split{RESET}                         sp
-        equal = e, percentage = p, fixed = f
+        equal                                      e
+        percentage                                 p
+        fixed                                      f
       {B_CYAN}quit{RESET}                          exit, q
 
     """)
