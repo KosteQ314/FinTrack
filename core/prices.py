@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import sys
 import urllib.request
 
 from core.config import get as get_config
@@ -21,9 +22,7 @@ def _bundled_token():
         return ""
 
 
-def fetch_prices():
-    """Hit the API and return {commodity: {"buy": int, "sell": int}}.
-    Raises on any failure so callers/tests can see the real error."""
+def fetch_raw():
     base = get_config("uex_api_base").rstrip("/")
     req = urllib.request.Request(
         f"{base}/commodities_prices_all",
@@ -32,13 +31,15 @@ def fetch_prices():
     token = get_config("uex_api_token") or _bundled_token()
     if token:
         req.add_header("Authorization", f"Bearer {token}")
-
     with urllib.request.urlopen(req, timeout=10) as resp:
         payload = json.load(resp)
-
     if payload.get("status") != "ok":
         raise RuntimeError(f"UEX returned status: {payload.get('status')}")
-    return _aggregate(payload["data"])
+    return payload["data"]
+
+
+def fetch_prices():
+    return _aggregate(fetch_raw())
 
 
 def _aggregate(rows):
