@@ -83,7 +83,7 @@ Descriptions must match one of the known keywords (refuel, fuel, repair, cargo, 
 
 ## Contributing
 
-**Contributions are definitely welcome** as I'm doing it fully alone currently and my current programming knowledge is scarce.
+**Contributions are welcome adn encouraged** as I'm doing it fully alone currently and my current programming knowledge is scarce.
 
 ## License
 
