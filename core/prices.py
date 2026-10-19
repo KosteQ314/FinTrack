@@ -9,6 +9,18 @@ CACHE_PATH = os.path.expanduser("~/.FinTrack/prices_cache.json")
 CACHE_TTL = 30 * 60  # seconds, matches UEX's own cache
 
 
+def _bundled_token():
+    if getattr(sys, "frozen", False):
+        base = sys._MEIPASS
+    else:
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        with open(os.path.join(base, "uex_key.txt")) as f:
+            return f.read().strip()
+    except OSError:
+        return ""
+
+
 def fetch_prices():
     """Hit the API and return {commodity: {"buy": int, "sell": int}}.
     Raises on any failure so callers/tests can see the real error."""
@@ -17,7 +29,7 @@ def fetch_prices():
         f"{base}/commodities_prices_all",
         headers={"Accept": "application/json", "User-Agent": "FinTrack"},
     )
-    token = get_config("uex_api_token")
+    token = get_config("uex_api_token") or _bundled_token()
     if token:
         req.add_header("Authorization", f"Bearer {token}")
 
