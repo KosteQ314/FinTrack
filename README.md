@@ -78,12 +78,20 @@ Descriptions must match one of the known keywords (refuel, fuel, repair, cargo, 
 - [x] Transaction timestamps
 - [x] CSV export
 - [x] Installer
+- [ ] Commodity price pull
 - [ ] Voice control improvements
-- [ ] Organisation support
+- [ ] Org finance management
 
 ## Contributing
 
-**Contributions are welcome adn encouraged** as I'm doing it fully alone currently and my current programming knowledge is scarce.
+**Contributions are definitely welcome** as I'm doing it fully alone currently and my current programming knowledge is scarce.
+
+### Support
+
+If you enjoy FinTrack and want to support development, consider buying me a coffee!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M8F022E71O)\
+Any support is greatly appreciated and motivates me to keep working and improving the project knowing that people are invested in it.
 
 ## License
 
