@@ -74,6 +74,9 @@ def _session_to_dict(session):
                 "amount": t.amount,
                 "type": t.type.value,
                 "timestamp": t.timestamp,
+                "commodity": t.commodity,
+                "scu": t.scu,
+                "unit_price": t.unt_price,
             }
             for t in session.transactions
         ],
@@ -95,6 +98,9 @@ def _dict_to_session(d):
             type=TransactionType(t["type"]),
             id=t["id"],
             timestamp=t.get("timestamp", datetime.now().isoformat()),
+            commodity=t.get("commodity", ""),
+            scu=t.get("scu", 0),
+            unt_price=t.get("unt_price", 0)
         )
         for t in d["transactions"]
     ]

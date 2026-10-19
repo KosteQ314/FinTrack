@@ -21,6 +21,8 @@ DEFAULTS = {
     "voice_hotkey": "f8",
     "app_toggle_hotkey": "f7",
     "voice_cancel_timeout": 5,
+    "uex_api_base": "https://api.uexcorp.uk/2.0",
+    "uex_api_token": "",
 }
 
 

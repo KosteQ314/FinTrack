@@ -19,6 +19,9 @@ class Transaction:
     type: TransactionType
     id: str = field(default_factory=lambda: uuid.uuid4().hex[:8])
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
+    commodity: str = "" # ie. Quantainium, empty for transactions not requiing commodity prices
+    scu: float = 0 # amount of commodity when logged
+    unit_price: int = 0 # price of said commodity per SCU
 
 
 # Specifies a player
