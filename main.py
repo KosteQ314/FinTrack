@@ -569,6 +569,8 @@ def main():
             break
         except SystemExit:
             break
+        except Exception as e:
+            print(f"Error: {e}")
     input("Press Enter to exit...")
 
 
