@@ -1,7 +1,8 @@
+import difflib
 import json
 import os
-import time
 import sys
+import time
 import urllib.request
 
 from core.config import get as get_config
@@ -38,10 +39,6 @@ def fetch_raw():
     return payload["data"]
 
 
-def fetch_prices():
-    return _aggregate(fetch_raw())
-
-
 def _aggregate(rows):
     """Average each commodity's price across all terminals that report one."""
     acc = {}
@@ -54,38 +51,62 @@ def _aggregate(rows):
             entry["buy"].append(r["price_buy_avg"])
         if (r.get("price_sell_avg") or 0) > 0:
             entry["sell"].append(r["price_sell_avg"])
-
-    result = {}
-    for name, e in acc.items():
-        result[name] = {
+    return {
+        name: {
             "buy": int(sum(e["buy"]) / len(e["buy"])) if e["buy"] else 0,
             "sell": int(sum(e["sell"]) / len(e["sell"])) if e["sell"] else 0,
         }
-    return result
+        for name, e in acc.items()
+    }
 
 
-def get_prices():
-    """Cached lookup that never raises. Returns {} if nothing is available."""
+def _build(rows):
+    """Averages plus the per-terminal list (same _avg fields as the averages)."""
+    terminals = {}
+    for r in rows:
+        name = r.get("commodity_name")
+        if not name:
+            continue
+        terminals.setdefault(name, []).append({
+            "terminal": r.get("terminal_name") or "Unknown",
+            "buy": int(r.get("price_buy_avg") or 0),
+            "sell": int(r.get("price_sell_avg") or 0),
+        })
+    return {"prices": _aggregate(rows), "terminals": terminals}
+
+
+def fetch_prices():
+    return _aggregate(fetch_raw())
+
+
+def get_data():
+    """Cached lookup that never raises. Empty data if nothing is available."""
     cached = None
     if os.path.exists(CACHE_PATH):
         try:
             with open(CACHE_PATH) as f:
                 cached = json.load(f)
+            if "data" not in cached:  # old cache format
+                cached = None
         except Exception:
             cached = None
 
     if cached and time.time() - cached.get("fetched", 0) < CACHE_TTL:
-        return cached["prices"]
+        return cached["data"]
 
     try:
-        prices = fetch_prices()
+        data = _build(fetch_raw())
         os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
         with open(CACHE_PATH, "w") as f:
-            json.dump({"fetched": time.time(), "prices": prices}, f)
-        return prices
+            json.dump({"fetched": time.time(), "data": data}, f)
+        return data
     except Exception:
         # API down or blocked: fall back to stale cache if we have one
-        return cached["prices"] if cached else {}
+        return cached["data"] if cached else {"prices": {}, "terminals": {}}
+
+
+def get_prices():
+    return get_data()["prices"]
 
 
 def list_commodities():
@@ -95,3 +116,23 @@ def list_commodities():
 def get_price(commodity, side="sell"):
     """side: 'sell' = what you receive selling, 'buy' = what you pay buying."""
     return get_prices().get(commodity, {}).get(side, 0)
+
+
+def best_terminals(commodity, side="sell", limit=5):
+    """Best places to sell (highest price) or buy (lowest price)."""
+    rows = [r for r in get_data()["terminals"].get(commodity, []) if r[side] > 0]
+    rows.sort(key=lambda r: r[side], reverse=(side == "sell"))
+    return rows[:limit]
+
+
+def find_commodity(query):
+    """Resolve typed text to a real commodity name, or None."""
+    lower = {n.lower(): n for n in get_prices()}
+    q = query.lower()
+    if q in lower:
+        return lower[q]
+    starts = [n for l, n in lower.items() if l.startswith(q)]
+    if len(starts) == 1:
+        return starts[0]
+    close = difflib.get_close_matches(q, list(lower), n=1, cutoff=0.6)
+    return lower[close[0]] if close else None

@@ -142,6 +142,9 @@ def handle_command(parts):
       {B_CYAN}remove-player <name>{RESET}          remove a player from active session
       {B_CYAN}income <desc> <amount>{RESET}        record income
       {B_CYAN}expense <desc> <amount>{RESET}       record an expense
+      {B_CYAN}price <commodity> [scu]{RESET}       check prices for a give commodity
+      {B_CYAN}link <id> <commodity> [scu]{RESET}   link a commodity to a transaction
+      {B_CYAN}unlink <id>{RESET}                   unlink the commodity from the transaction
       {B_CYAN}remove-transaction <id>{RESET}       remove a transaction
       {B_CYAN}show <mode>{RESET}                   show active session details
       {B_CYAN}report{RESET}                        show session report
@@ -157,6 +160,9 @@ def handle_command(parts):
       {B_CYAN}remove-player{RESET}                 rmp
       {B_CYAN}income{RESET}                        inc, i
       {B_CYAN}expense{RESET}                       exp, e
+      {B_CYAN}price{RESET}                         p
+      {B_CYAN}link{RESET}                          l, attach
+      {B_CYAN}unlink{RESET}                        deattach
       {B_CYAN}remove-transaction{RESET}            rmt
       {B_CYAN}show{RESET}                          s
         player                                     p
@@ -282,6 +288,98 @@ def handle_command(parts):
         s.transactions.append(Transaction(parts[1], amount, TransactionType.EXPENSE))
         save_session(s)
         print(f"Added expense: {parts[1]}   {RED}{amount}{RESET}")
+
+    # Price check
+    elif cmd in ("price", "p"):
+        if len(parts) < 2:
+            print("Usage: price <commodity> [scu]")
+            return
+        from core.prices import find_commodity, get_price, best_terminals
+
+        commodity = find_commodity(parts[1])
+        if not commodity:
+            print(f"Unknown commodity '{parts[1]}' (or prices are unavailable).")
+            return
+        scu = None
+        if len(parts) > 2:
+            try:
+                scu = float(parts[2])
+            except ValueError:
+                print(f"'{parts[2]}' isn't a valid SCU amount.")
+                return
+
+        avg_sell = get_price(commodity, "sell")
+        avg_buy = get_price(commodity, "buy")
+        print(f"\n {commodity}")
+        print(f"    avg sell: {avg_sell:,}/SCU    avg buy: {avg_buy:,}/SCU")
+        if scu:
+            print(f"    {scu:g} SCU sells for ~{int(scu * avg_sell):,} aUEC on average")
+
+        for title, side in (("Best places to sell", "sell"), ("Cheapest places to buy", "buy")):
+            rows = best_terminals(commodity, side)
+            print(f"\n {title}:")
+            if not rows:
+                print(" no data")
+            for r in rows:
+                total = f" = {int(scu * r[side]):,}" if scu else ""
+                print(f"    {r['terminal'][:34]:<34} {r[side]:>8,}/SCU{total}")
+        print()
+
+    #Link commodity to transaction
+    elif cmd in ("link", "l", "attach"):
+        s = active_session
+        if not s:
+            print("No active session. Use 'use <name>' first.")
+            return
+        if len(parts) < 3:
+            print("Usage: link <transaction id> <commodity> [scu]")
+            return
+        t = next((t for t in s.transactions if t.id == parts[1]), None)
+        if not t:
+            print(f"Not transaction with id '{parts[1]}'.")
+            return
+
+        from core.prices import find_commodity, get_price
+
+        commodity = find_commodity(parts[2])
+        if not commodity:
+            print(f"Unknown commodity '{parts[2]}' (or prices are unavailable).")
+            return
+        scu = 0
+        if len(parts) > 3:
+            try:
+                scu = float(parts[3])
+            except ValueError:
+                print(f"'{parts[3]}' isn't a valid SCU amount.")
+                return
+
+        side = "sell" if t.type == TransactionType.INCOME else "buy"
+        t.commodity = commodity
+        t.scu = scu
+        t.unit_price = get_price(commodity, side)
+        save_session(s)
+        print(f"Lnked {commodity} to '{t.description}'.")
+        if scu > 0 and t.unit_price:
+            actual = int(t.amount / scu)
+            diff = (actual - t.unit_price) / t.unit_price * 100
+            print(f" Your price: {actual:,}/SCU vs market {t.unit_price:,}/SCU ({diff:+.0f}%)")
+
+    # Unlink commodity from transaction
+    elif cmd in ("unlink", "deattach"):
+        s = active_session
+        if not s:
+            print("No active session. Use 'use <name>' first.")
+            return
+        if len(parts) < 2:
+            print("Usage: unlink <transaction id>")
+            return
+        t = next((t for t in s.transactions if t.id == parts[1]), None)
+        if not t:
+            print(f"No transaction with id '{parts[1]}'.")
+            return
+        t.commodity, t.scu, t.unit_price = "", 0, 0
+        save_session(s)
+        print(f"Unlinked commodity from '{t.description}'.")
 
     # Remove transaction
     elif cmd in ("remove-transaction", "rmt"):
