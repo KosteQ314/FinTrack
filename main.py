@@ -485,11 +485,11 @@ def handle_command(parts):
             with open(filename, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(
-                    ["ID", "Description", "Type", "Amount (aUEC)", "Timestamp"]
+                    ["ID", "Description", "Type", "Amount (aUEC)", "Timestamp", "Commodity", "SCU", "Unit Price(aUEC"]
                 )
                 for t in s.transactions:
                     writer.writerow(
-                        [t.id, t.description, t.type.value, t.amount, t.timestamp]
+                        [t.id, t.description, t.type.value, t.amount, t.timestamp, t.commodity, t.scu or "", t.unit_price or ""]
                     )
                 writer.writerow([])
                 writer.writerow(["Summary", "", "", "", ""])
