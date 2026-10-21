@@ -147,6 +147,13 @@ class FinTrackApp(QMainWindow):
         bar_layout.addWidget(self.statusLabel)
         bar_layout.addStretch()
 
+        prices_btn = QPushButton("$ Prices")
+        prices_btn.setObjectName("bar_btn")
+        prices_btn.setFixedWidth(90)
+        prices_btn.setFixedHeight(24)
+        prices_btn.clicked.connect(self._open_prices)
+        bar_layout.addWidget(prices_btn)
+
         export_btn = QPushButton("⤓ Export CSV")
         export_btn.setObjectName("bar_btn")
         export_btn.setFixedWidth(140)
@@ -207,6 +214,10 @@ class FinTrackApp(QMainWindow):
             self.setWindowOpacity(1.0)
         self.show()
         self.activateWindow()  # ← brings focus back to the app when switching to app mode
+
+    def _open_prices(self):
+        from gui.widgets.prices_dialog import PricesDialog
+        PricesDialog(self).exec()
 
     def _export_csv(self):
         if not self.session:
