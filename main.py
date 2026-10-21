@@ -22,6 +22,20 @@ def get_prompt():
     return "> "
 
 
+# One-line description of a linked commodity, or None.
+def commodity_note(t):
+    if not t.commodity:
+        return None
+    bits = [t.commodity]
+    if t.scu:
+        bits.append(f"{t.scu:g} SCU")
+        actual = int(t.amount / t.scu)
+        bits.append(f"{actual:,}/SCU")
+    if t.unit_price:
+        bits.append(f"market {t.unit_price:,}")
+    return " · ".join(bits)
+
+
 # Prints a report of the session's transactions and players.
 def print_report(session):
     GREEN = "\033[92m"
@@ -56,6 +70,10 @@ def print_report(session):
             amt_str = f"{int(t.amount):>{amt_width},} aUEC"
             desc_str = f"{t.description:<{desc_width}}"
             print(f"  {color}{symbol}{RESET} {desc_str}  {amt_str}")
+
+            note = commodity_note(t)
+            if note:
+                print(f"      {FAINT}{note}{RESET}")
     else:
         print("\n  No transactions yet.")
 
@@ -98,6 +116,7 @@ def handle_command(parts):
     RESET = "\033[0m"
     BOLD = "\033[1m"
     BLACK = "\033[30m"
+    FAINT = "\033[2m"
     RED = "\033[31m"
     GREEN = "\033[32m"
     YELLOW = "\033[33m"
@@ -435,6 +454,10 @@ def handle_command(parts):
                     reset = "\033[0m"
                     line = f"  {symbol} {t.description:<{desc_width}} {t.amount:>{amt_width},.0f} aUEC  (id: {t.id})"
                     print(line[:2] + color + line[2] + reset + line[3:])
+
+                    note = commodity_note(t)
+                    if note:
+                        print(f"      {FAINT}{note}{RESET}")
                 print()
 
         else:
