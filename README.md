@@ -78,7 +78,7 @@ Descriptions must match one of the known keywords (refuel, fuel, repair, cargo, 
 - [x] Transaction timestamps
 - [x] CSV export
 - [x] Installer
-- [ ] Commodity price pull
+- [x] Commodity price pull
 - [ ] Voice control improvements
 - [ ] Org finance management
 
