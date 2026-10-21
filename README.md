@@ -2,6 +2,7 @@
 
 <p align="center">
     <a href="https://github.com/KosteQ314/FinTrack/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/KosteQ314/FinTrack"></a>
+    <img src="https://uexcorp.space/img/api/uex-api-badge-powered.png" height="20">
     <a href="https://github.com/KosteQ314/FinTrack/graphs/commit-activity"><img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/KosteQ314/FinTrack?color=neongreen"></a>
 </p>
 
