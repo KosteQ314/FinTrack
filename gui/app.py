@@ -229,11 +229,11 @@ class FinTrackApp(QMainWindow):
             with open(path, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(
-                    ["ID", "Description", "Type", "Amount (aUEC)", "Timestamp"]
+                    ["ID", "Description", "Type", "Amount (aUEC)", "Timestamp", "Commodity", "SCU", "Unit price (aUEC)"]
                 )
                 for t in self.session.transactions:
                     writer.writerow(
-                        [t.id, t.description, t.type.value, t.amount, t.timestamp]
+                        [t.id, t.description, t.type.value, t.amount, t.timestamp, t.commodity, t.scu or "", t.unit_price or ""]
                     )
                 writer.writerow([])
                 writer.writerow(["Summary", "", "", "", ""])
