@@ -1,3 +1,32 @@
+## **2.2.0-rc.1**&emsp;<sub><sup>2026-10-22 (21444f0b6b8c05312a98d4057c4935940ec88ba8...2a78a2c34cf14aa05f075efe934ba8cdf0b5ec0d)</sup></sub>
+
+### Features
+
+- add functionality to check prices and link commodities to transactions (97a70a8ab40da447ef4b3ea97ada6690063dd8e3)
+
+##### &ensp;`CLI`
+
+- show linked commodity under transactions in report and show (6c39053af8ddf225d9371cc9099474fef24acd1a)
+
+##### &ensp;`GUI`
+
+- add commodity prices dialog (872a4f5d44885bd7b5474855c6f3a40857fc2462)
+- add commodity link functionality (489ef9324700360be9204cd22c8d50febf7bfe2b)
+
+### Bug Fixes
+
+##### &ensp;`CLI`
+
+- errors will no longer crash the application, insted will just show the error (e88ae9c8940076c7b8daf287aebf6f8424261736)
+
+### Performance Improvements
+
+- add more known descriptions (469a1b2da6e86373e40388a0f829f05b1d50403c)
+
+### BREAKING CHANGES
+-  add functionality to check prices and link commodities to transactions (97a70a8ab40da447ef4b3ea97ada6690063dd8e3)
+<br>
+
 ## **2.1.0**&emsp;<sub><sup>2026-07-01 (adb7e69a6100ea6f4e908e078b79d7f878abec30...38399690d07902b8ca1acf2cb246d09b3da06da6)</sup></sub>
 
 ### BREAKING CHANGES
