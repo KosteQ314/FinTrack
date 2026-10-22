@@ -20,7 +20,7 @@ class FinTrackApp(QMainWindow):
         self.is_overlay_mode = False
 
         self.setWindowTitle("FinTrack")
-        self.setMinimumSize(900, 600)
+        self.setMinimumSize(1050, 700)
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #0a0e17;
@@ -149,8 +149,8 @@ class FinTrackApp(QMainWindow):
 
         prices_btn = QPushButton("$ Prices")
         prices_btn.setObjectName("bar_btn")
-        prices_btn.setFixedWidth(90)
-        prices_btn.setFixedHeight(24)
+        prices_btn.setFixedWidth(140)
+        prices_btn.setFixedHeight(30)
         prices_btn.clicked.connect(self._open_prices)
         bar_layout.addWidget(prices_btn)
 
@@ -163,7 +163,7 @@ class FinTrackApp(QMainWindow):
 
         self.toggle_btn = QPushButton("⧉  Overlay mode")
         self.toggle_btn.setObjectName("bar_btn")
-        self.toggle_btn.setFixedWidth(150)
+        self.toggle_btn.setFixedWidth(140)
         self.toggle_btn.setFixedHeight(30)
         self.toggle_btn.clicked.connect(self.toggle_overlay_mode)
         bar_layout.addWidget(self.toggle_btn)

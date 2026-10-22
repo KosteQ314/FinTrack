@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QPushButton,
     QScrollArea,
+    QMenu,
     QVBoxLayout,
     QWidget,
 )
@@ -256,46 +257,43 @@ class MainPanelWidget(QWidget):
                 background: rgba(255,255,255,6);
                 border: 1px solid rgba(100,160,255,40);
             }
-            QPushButton {
-                background: transparent;
-                border: none;
-                color: rgba(255, 80, 80, 200);
-                font-size: 15px;
-                font-weight: bold;
-                padding: 0px;
-            }
-            QPushButton:hover {
-                color: rgba(255, 80, 80, 255);
-            }
         """)
         row_layout = QHBoxLayout(row)
         row_layout.setContentsMargins(10, 6, 10, 6)
-
         is_income = transaction.type == TransactionType.INCOME
         symbol = "+" if is_income else "−"
         color = "#2ecc71" if is_income else "#e74c3c"
-
         symbol_label = QLabel(symbol)
         symbol_label.setStyleSheet(
             f"color: {color}; font-size: 14px; font-weight: bold;"
         )
         symbol_label.setFixedWidth(16)
-
         desc_label = QLabel(transaction.description)
         desc_label.setStyleSheet("color: #c8d6e8; font-size: 13px;")
 
+        tag_label = None
+        if transaction.commodity:
+            tag_text = transaction.commodity
+            if transaction.scu:
+                tag_text += f" · {transaction.scu:g} SCU"
+            tag_label = QLabel(tag_text)
+            tag_label.setStyleSheet("color: rgba(100,160,255,170); font-size: 10px;")
+            if transaction.unit_price:
+                tip = f"Market at link time: {transaction.unit_price:,}/SCU"
+                if transaction.scu:
+                    actual = int(transaction.amount / transaction.scu)
+                    diff = (actual - transaction.unit_price) / transaction.unit_price * 100
+                    tip += f"\nYour price: {actual:,}/SCU ({diff:+.0f}%)"
+                tag_label.setToolTip(tip)
         try:
             dt = datetime.fromisoformat(transaction.timestamp)
             time_str = dt.strftime("%d %b  %H:%M")
         except Exception:
             time_str = ""
-
         time_label = QLabel(time_str)
         time_label.setStyleSheet("color: rgba(150,170,200,100); font-size: 10px;")
-
         amt_label = QLabel(f"{int(transaction.amount):,} aUEC")
         amt_label.setStyleSheet(f"color: {color}; font-size: 13px;")
-
         remove_btn = QPushButton("×")
         remove_btn.setFixedSize(22, 22)
         remove_btn.setStyleSheet("""
@@ -312,12 +310,17 @@ class MainPanelWidget(QWidget):
             }
         """)
         remove_btn.clicked.connect(lambda _, t=transaction: self._remove_transaction(t))
-
         row_layout.addWidget(symbol_label)
         row_layout.addWidget(desc_label, stretch=1)
+        if tag_label:
+            row_layout.addWidget(tag_label)
         row_layout.addWidget(time_label)
         row_layout.addWidget(amt_label)
         row_layout.addWidget(remove_btn)
+        row.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        row.customContextMenuRequested.connect(
+            lambda pos, t=transaction, r=row: self._tx_menu(t, r.mapToGlobal(pos))
+        )
         return row
 
     def _add_transaction(self, t_type):
@@ -359,6 +362,45 @@ class MainPanelWidget(QWidget):
         save_session(self.session)
         if self.on_transaction_removed:
             self.on_transaction_removed()
+
+    def _tx_menu(self, transaction, global_pos):
+        menu = QMenu(self)
+        menu.setStyleSheet("""
+            QMenu {
+                background: #0d1220;
+                border: 1px solid rgba(100,160,255,60);
+                border-radius: 4px;
+                color: #c8d6e8;
+                padding: 4px;
+            }
+            QMenu::item { padding: 6px 20px; border-radius: 3px; }
+            QMenu::item:selected { background: rgba(100,160,255,30); }
+        """)
+        linked = bool(transaction.commodity)
+        link = menu.addAction("Change commodity..." if linked else "Link commodity...")
+        unlink = menu.addAction("Unlink commodity") if linked else None
+
+        action = menu.exec(global_pos)
+        if action is None:
+            return
+        if action == link:
+            self._link_commodity(transaction)
+        elif unlink is not None and action == unlink:
+            self._unlink_commodity(transaction)
+
+    def _link_commodity(self, transaction):
+        from gui.widgets.link_dialog import LinkDialog
+
+        dlg = LinkDialog(self, transaction)
+        if dlg.exec():
+            transaction.commodity, transaction.scu, transaction.unit_price = dlg.values()
+            save_session(self.session)
+            self._refresh_transactions(self.search_input.text())
+
+    def _unlink_commodity(self, transaction):
+        transaction.commodity, transaction.scu, transaction.unit_price = "", 0, 0
+        save_session(self.session)
+        self._refresh_transactions(self.search_input.text())
 
     def update_session(self, session):
         self.session = session
