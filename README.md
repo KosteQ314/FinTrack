@@ -13,10 +13,11 @@ Track income, expenses and profits across Star Citizen with a financial manageme
 ## Features
 
 - **Full GUI app** — session management, transaction tracking, player splits, CSV export
-- **In-game overlay** — always-on-top input panel, summon with `F9`
+- **In-game overlay** — always-on-top input panel, show with `F9`
 - **Voice control** — log transactions hands-free with natural voice commands
-- **CLI** — lightweight command line interface for quick edits
+- **Commodity price check** - activel pulls data from UEX about commodity prices at all terminals
 - **Profit splitting** — equal, percentage, and fixed splits across players
+- **CLI** — lightweight command line interface for quick edits
 
 ## Installation
 
