@@ -1,5 +1,5 @@
 #define MyAppName "FinTrack"
-#define MyAppVersion "2.1.0"
+#define MyAppVersion "2.2.0-rc.1"
 #define MyAppPublisher "KosteQ314"
 #define MyAppURL "https://github.com/KosteQ314/FinTrack"
 #define MyAppExeName "FinTrack.exe"
